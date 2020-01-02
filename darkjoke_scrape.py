@@ -35,6 +35,11 @@ def get_soup(url):
     with urlopen(request) as response:
         return BeautifulSoup(response, 'html.parser')
 
+def to_json(output):
+    with open(output, 'w') as outfile:
+        json.dump({'jokes': all_jokes}, outfile)
+    
+
 urls = {
     bestlifeonline: 'https://bestlifeonline.com/dark-jokes/',
     thoughtcatalog: 'https://thoughtcatalog.com/juliet-lanka/2018/03/50-messed-up-jokes-you-should-never-tell-your-easily-offended-friends/',
@@ -43,3 +48,5 @@ urls = {
 for func, url in urls.items():
     soup = get_soup(url)
     func(soup)
+
+to_json('jokes.json')
