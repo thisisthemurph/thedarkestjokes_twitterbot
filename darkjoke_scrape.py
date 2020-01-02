@@ -1,10 +1,11 @@
 from urllib.request import Request, urlopen
 from bs4 import BeautifulSoup
 import json
+import argparse
 
 all_jokes = []
 
-def bestlifeonline(url):
+def bestlifeonline(soup):
     jokes = soup.find('ol')
     for joke in jokes.find_all('li'):
         all_jokes.append(joke.text.strip())
@@ -45,8 +46,17 @@ urls = {
     thoughtcatalog: 'https://thoughtcatalog.com/juliet-lanka/2018/03/50-messed-up-jokes-you-should-never-tell-your-easily-offended-friends/',
 }
 
-for func, url in urls.items():
-    soup = get_soup(url)
-    func(soup)
+def main():
+    parser = argparse.ArgumentParser(description='A utility for scraping jokes')
+    parser.add_argument('out', help='Path to the output JSON file')
 
-to_json('jokes.json')
+    args = parser.parse_args()
+
+    for func, url in urls.items():
+        soup = get_soup(url)
+        func(soup)
+
+    to_json(args.out)
+
+if __name__ == '__main__':
+    main()
