@@ -24,8 +24,6 @@ function tweetRandomJoke() {
                     console.log('duplicate tweet')
                     tweetRandomJoke()
                 }
-            } else {
-                console.log('We Tweeted!')
             }
         }
     )
