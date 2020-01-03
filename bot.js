@@ -21,8 +21,9 @@ function tweetRandomJoke() {
             if (err) {
                 // Duplicate tweet
                 if (err.code === 187) {
-                    console.log('duplicate tweet')
                     tweetRandomJoke()
+                } else {
+                    console.log('other error ' + err.code)
                 }
             }
         }
