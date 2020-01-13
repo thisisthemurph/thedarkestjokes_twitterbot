@@ -17,16 +17,6 @@ const getRandomJoke = () => {
     }
 }
 
-getRandomJoke()
-    .then(response => {
-        const joke = response.data.text
-        console.log(joke)
-    })
-    .catch(err => {
-        console.error('There was an error obtaining a random joke')
-        console.error(err)
-    })
-
 const tweetRandomJoke = () => {
     getRandomJoke()
         .then(response => {
@@ -52,5 +42,5 @@ const tweetRandomJoke = () => {
 
 // The code above will run evry hour. starting instantly
 const everyHour = 1000*60*60
-// setInterval(tweetRandomJoke, everyHour)
-// tweetRandomJoke()
+setInterval(tweetRandomJoke, everyHour)
+tweetRandomJoke()
