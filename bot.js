@@ -7,11 +7,25 @@ const T = new twit(twitterConfig)
 
 const getRandomJoke = () => {
     try {
-        return axios.get(jokeApiConfig.randomJokeUrl)
+        return axios.get(jokeApiConfig.randomJokeUrl, {
+            params: {
+                adult: true
+            }
+        })
     } catch (err) {
         console.error(err)
     }
 }
+
+getRandomJoke()
+    .then(response => {
+        const joke = response.data.text
+        console.log(joke)
+    })
+    .catch(err => {
+        console.error('There was an error obtaining a random joke')
+        console.error(err)
+    })
 
 const tweetRandomJoke = () => {
     getRandomJoke()
@@ -37,6 +51,6 @@ const tweetRandomJoke = () => {
 }
 
 // The code above will run evry hour. starting instantly
-const evryHour = 1000*60*60
-setInterval(tweetRandomJoke, evryHour)
-tweetRandomJoke()
+const everyHour = 1000*60*60
+// setInterval(tweetRandomJoke, everyHour)
+// tweetRandomJoke()
