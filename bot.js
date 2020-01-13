@@ -1,4 +1,4 @@
-const config = require('./config.js')
+const config = require('./config/config.js')
 const fs = require('fs')
 const twit = require('twit')
 const T = new twit(config)
