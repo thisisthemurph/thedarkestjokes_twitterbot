@@ -19,7 +19,8 @@ function tweetRandomJoke() {
         {status: joke},
         function(err, data, response) {
             if (err) {
-                // Duplicate tweet
+                // This error code indicates that an identical 
+                // tweet has been sent recently
                 if (err.code === 187) {
                     tweetRandomJoke()
                 } else {
