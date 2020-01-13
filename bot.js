@@ -1,35 +1,42 @@
-const config = require('./config/config.js')
-const fs = require('fs')
+const twitterConfig = require('./config/twitter.api.config.js')
+const jokeApiConfig = require('./config/joke.api.config.js')
+
+const axios = require('axios')
 const twit = require('twit')
-const T = new twit(config)
+const T = new twit(twitterConfig)
 
-function getRandomJoke() {
-    let jokesFile = fs.readFileSync('jokes.json')
-    let jokes = JSON.parse(jokesFile)
-    
-    let r = Math.floor(Math.random() * jokes.jokes.length)
-    return jokes.jokes[r]
+const getRandomJoke = () => {
+    try {
+        return axios.get(jokeApiConfig.randomJokeUrl)
+    } catch (err) {
+        console.error(err)
+    }
 }
 
-function tweetRandomJoke() {
-    let joke = getRandomJoke()
-    
-    T.post(
-        'statuses/update',
-        {status: joke},
-        function(err, data, response) {
-            if (err) {
-                // This error code indicates that an identical 
-                // tweet has been sent recently
-                if (err.code === 187) {
-                    tweetRandomJoke()
-                } else {
-                    console.log('other error ' + err.code)
+const tweetRandomJoke = () => {
+    getRandomJoke()
+        .then(response => {
+            const joke = response.data.text
+
+            T.post('statuses/update', {status: joke}, (err, data, response) => {
+                if (err) {
+                    // This error code indicates that an identical 
+                    // tweet has been sent recently
+                    if (err.code === 187) {
+                        tweetRandomJoke()
+                    } else {
+                        console.error('other error ' + err.code)
+                    }
                 }
-            }
-        }
-    )
+            })
+        })
+        .catch(err => {
+            console.error('There was an error obtaining a random joke')
+            console.error(err)
+        })
 }
 
+// The code above will run evry hour. starting instantly
+const evryHour = 1000*60*60
+setInterval(tweetRandomJoke, evryHour)
 tweetRandomJoke()
-setInterval(tweetRandomJoke, 1000*60*60)
