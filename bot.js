@@ -17,6 +17,12 @@ const getRandomJoke = () => {
     }
 }
 
+const ERR_CODES = {
+    // https://developer.twitter.com/en/docs/basics/response-codes
+    too_long: 186,
+    duplicate: 187
+}
+
 const tweetRandomJoke = () => {
     getRandomJoke()
         .then(response => {
@@ -26,7 +32,7 @@ const tweetRandomJoke = () => {
                 if (err) {
                     // This error code indicates that an identical 
                     // tweet has been sent recently
-                    if (err.code === 187) {
+                    if (err.code in Object.values(ERR_CODES)) {
                         tweetRandomJoke()
                     } else {
                         console.error('other error ' + err.code)
