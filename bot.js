@@ -5,48 +5,40 @@ const axios = require('axios')
 const twit = require('twit')
 const T = new twit(twitterConfig)
 
-const getRandomJoke = () => {
-    try {
-        return axios.get(jokeApiConfig.randomJokeUrl, {
-            params: {
-                adult: true
-            }
-        })
-    } catch (err) {
-        console.error(err)
-    }
-}
-
 const ERR_CODES = {
     // https://developer.twitter.com/en/docs/basics/response-codes
-    too_long: 186,
-    duplicate: 187
+    too_long: 186,  // The tweet is too long for twitter
+    duplicate: 187  // Twitter thinks this was sent too recently
 }
 
-const tweetRandomJoke = () => {
-    getRandomJoke()
-        .then(response => {
-            const joke = response.data.text
+const getRandomJoke = tweet => {
+    const ax = axios.create({
+        baseURL: jokeApiConfig.baseURL,
+        timeout: 1000,
+        params: {
+            adult: true
+        }
+    })
 
-            T.post('statuses/update', {status: joke}, (err, data, response) => {
-                if (err) {
-                    // This error code indicates that an identical 
-                    // tweet has been sent recently
-                    if (err.code in Object.values(ERR_CODES)) {
-                        tweetRandomJoke()
-                    } else {
-                        console.error('other error ' + err.code)
-                    }
-                }
-            })
-        })
-        .catch(err => {
-            console.error('There was an error obtaining a random joke')
-            console.error(err)
-        })
+    ax.get('/random')
+        .then(result => tweet(result.data.text))
+        .catch(err => console.error(err))
 }
 
-// The code above will run evry hour. starting instantly
-const everyHour = 1000*60*60
-setInterval(tweetRandomJoke, everyHour)
-tweetRandomJoke()
+const tweetText = text => {
+    T.post('statuses/update', { status: text }, (err, data, response) => {
+        if (err) {
+            if (err.code in Object.values(ERR_CODES)) {
+                getRandomJoke(tweetText)
+            } else {
+                console.error(`Other error ${err.code}`)
+            }
+        }
+    })
+}
+
+// Send out an initial tweet, then periodically
+getRandomJoke(tweetText)
+
+const fourHours = 4000*60*60
+setInterval(() => getRandomJoke(tweetText), fourHours)
